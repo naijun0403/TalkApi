@@ -1,0 +1,100 @@
+openapi: "3.0.3"
+info:
+  title: "Talk API"
+  description: "documentation for the Talk API"
+  version: "1.0.0"
+servers:
+  - url: "https://talk-api.naijun.dev"
+paths:
+  /:
+    get:
+      description: "Hello World!"
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Hello World!"
+                  statusCode:
+                    type: string
+                    example: "OK"
+
+  /api/v1/send:
+    post:
+      description: "Send a message"
+      security:
+        - ApiKeyAuth: [ ]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WriteRequest'
+      responses:
+        "200":
+          description: "OK"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                    status:
+                        type: integer
+                        example: 0
+                    errMsg:
+                        type: string
+                        example: ""
+                    chatLog:
+                        type: object
+        "400":
+          description: "Bad Request"
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: integer
+                    example: -500
+                  errMsg:
+                    type: string
+                    example: ""
+components:
+  schemas:
+    WriteRequest:
+      type: object
+      required:
+        - chatId
+        - message
+      properties:
+        chatId:
+          type: integer
+          format: int64
+          description: "Chat identifier"
+        type:
+          type: integer
+          default: 1
+          description: "Message type"
+        message:
+          type: string
+          description: "Message content"
+        attachment:
+          type: object
+          description: "Additional attachment data"
+          default: {}
+        msgId:
+          type: integer
+          format: int64
+          description: "Message identifier (generated automatically if not provided)"
+
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: "Custom authorization format: accessToken-deviceUUID"

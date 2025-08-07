@@ -1,0 +1,23 @@
+services:
+  web:
+    build: .
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+  https-portal:
+    image: steveltn/https-portal:1
+    ports:
+      - '80:80'
+      - '443:443'
+    restart: always
+    environment:
+      DOMAINS: 'talk-api.naijun.dev -> http://web:8080'
+      STAGE: 'production' # Don't use production until staging works
+      CUSTOM_NGINX_GLOBAL_HTTP_CONFIG_BLOCK: |
+        limit_req_zone $$binary_remote_addr zone=one:10m rate=10r/s;
+    volumes:
+      - https-portal-data:/var/lib/https-portal
+
+volumes:
+  https-portal-data:
